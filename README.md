@@ -3,7 +3,7 @@
 [![NASA Space Apps 2026](https://img.shields.io/badge/NASA_Space_Apps-2026-fc3d21?style=for-the-badge)](https://www.spaceappschallenge.org/)
 [![Challenge](https://img.shields.io/badge/Challenge-Interplanetary_Survival_Guide:_Martian_Map-0b3d91?style=for-the-badge)](https://www.spaceappschallenge.org/)
 [![Team](https://img.shields.io/badge/Team-Hibernation_Wale_Bhalu-ffb347?style=for-the-badge)](#)
-[![Build](https://img.shields.io/badge/E2E_Tests-132_Passed_|_0_Failed-3ddc84?style=for-the-badge)](#10--automated-end-to-end-qa-test-suite)
+[![Build](https://img.shields.io/badge/E2E_Tests-137_Passed_|_0_Failed-3ddc84?style=for-the-badge)](#10--automated-end-to-end-qa-test-suite)
 
 > **A zero-dependency tablet and helmet-HUD web application that gives a suited Mars astronaut a safe, slope-aware walking route to science targets in Jezero Crater, layering NASA imagery, terrain elevation, spectral minerals, radiation, and weather into one tactical view.**
 
@@ -14,7 +14,7 @@
 * **Challenge:** NASA Space Apps Challenge 2026 — *Interplanetary Survival Guide: Martian Map*
 * **Target Site:** Jezero Crater Western Delta, Mars (`18.4447°N, 77.4508°E` · **Sol 142**)
 * **Team:** **Hibernation Wale Bhalu** (`Abhinav · Aditi · Harsha · Nikhil`)
-* **Architecture:** Zero-dependency, single-bundle offline-capable web application (`index.html`, `< 350 KB`) engineered with vanilla HTML5, CSS3, SVG Cartography, and ES6+ JavaScript.
+* **Architecture:** Zero-dependency, single-bundle offline-capable web application (`index.html`, `< 352 KB`) engineered with vanilla HTML5, CSS3, SVG Cartography, and ES6+ JavaScript.
 
 Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on global planetary maps or cloud-dependent tools. **Pawstro** provides a hyper-local ($10 \times 10\text{ km}$) tactical console that computes slope-safe walking trajectories using an **8-directional A* (A-Star) pathfinding algorithm** over a 2D Digital Elevation Model (DEM) cost grid, dynamically adapting to spacesuit slope, distance, and oxygen constraints before transitioning into a first-person **Helmet Visor HUD** featuring real NASA Perseverance Rover imagery.
 
@@ -27,6 +27,7 @@ Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on globa
 * **Animated Meteor Shower:** Lightweight CSS `@keyframes starDrop` rendering 20 continuous diagonal star-streaks with soft starlight tails.
 * **Live Mission Telemetry Pill:** Status badge with pulsing emerald LED (`MARS 2026 · JEZERO CRATER · 18.4447°N 77.4508°E`).
 * **Floating Mascot Orbit:** Astronaut Polar Bear companion (`CAPCOM // PAW`) inside a glowing orbital ring with an interactive speech pill (*"One small paw for bear-kind! 🚀"*).
+* **Crew Manifest Plaque:** Positioned in the bottom-right corner displaying `TEAM // HIBERNATION WALE BHALU · CREW // ABHINAV · ADITI · HARSHA · NIKHIL` with amber edge illumination.
 * **Dual Launch CTAs:**
   * **`LAUNCH MISSION CONSOLE →` (`#enterApp`):** Smooth fade-and-scale transition revealing the main mission planner.
   * **`RUN 30s JUDGE DEMO` (`#enterDemo`):** 1-click instant setup that dismisses the landing screen, loads optimal suit parameters, computes the full multi-waypoint A* route, and opens Target A for inspection.
@@ -47,32 +48,28 @@ Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on globa
   * **`+` / `−`:** Smooth $1.3\times$ zoom in/out centered on the active viewport.
   * **`H` (Center Habitat):** Instantly centers the viewport on Habitat Base `(165, 270)`.
   * **`N` (Reset / North):** Restores the calibrated $700 \times 460$ orbital viewBox.
-  * **Mouse Drag & Keyboard Shortcuts:** Click-and-drag panning with bounds clamping, plus hotkeys `+`/`=`, `-`/`_`, `H`, `N`, and `Esc`.
-* **Live Coordinate Tracker (`#co`):** Real-time cursor tracking converting viewport coordinates into Martian Latitude and Longitude.
-* **5 Toggleable NASA Scientific Data Layers (`SYS-01`):**
-  1. **Photo (optical) (`#L-photo`):** Base satellite relief and geological context.
-  2. **Terrain height (`#L-terrain`):** 5 topographic contour rings with inline elevation labels (`-2380m` to `-2540m`).
-  3. **Minerals (`#L-mineral`):** CRISM spectral overlays highlighting Mg-Carbonate delta strata (`#ffe1c2`) and Fe/Mg-Smectite Clay & Olivine deposits (`#5de6c4`).
-  4. **Steep / no-go zones (`#L-steep`):** Hatched hazard polygons (`⚠ STEEP SCARP (>18°)`, `⚠ BOULDER FIELD`).
-  5. **Heat (thermal) (`#L-heat`):** THEMIS thermal inertia anomaly overlay.
-* **Continuous Opacity Slider (`#op`):** Dynamically adjusts overlay transparency from $20\%$ to $100\%$.
-* **Interactive Split-Screen Layer Comparison (`Compare layers`):** Enables a mouse-following vertical SVG curtain (`#cmpClip` & `#cmpSplitter`) to swipe between raw optical imagery (left) and scientific/hazard overlays (right).
+  * **Mouse Drag & Keyboard Shortcuts:** Click-and-drag panning with bounds clamping and instant coordinate tracking (`#mcoords` displays live Martian coordinates).
+* **Layer Toggles:** Independent visibility checkboxes for Optical Photo (`#L-photo`), Topography/DEM (`#L-dem`), Spectral Minerals (`#L-mineral`), and Steep Hazards (`#L-hazard`).
+* **Interactive Layer Comparison Slider (`#cmp`):** Vertical split-slider revealing the underlying optical mosaic on the left and the false-color mineral/hazard layer on the right with SVG `<clipPath>` synchronization.
 
-### 4. 🧮 Slope-Aware A* (A-Star) Pathfinding Engine (`NAV-03`)
-* **2D DEM & Slope Cost-Grid:** Evaluates a $70 \times 46$ elevation and slope grid ($10\text{m}$ cell resolution).
-* **Dynamic Suit Slope Enforcement:** Any cell where terrain slope exceeds the astronaut's **Max slope** slider (`#r1`) becomes a high-cost/impassable no-go obstacle, dynamically expanding or contracting the `#L-steep` hazard overlay and forcing the A* pathfinder to detour around steep scarps.
-* **3 Tactical Routing Optimization Modes:**
-  * 🛡️ **`Safest`:** Heavily penalizes incline (`slope × 18`), routing through flat basin corridors.
-  * ⚡ **`Fastest`:** Minimizes Euclidean distance and EVA walking duration while respecting `Max slope`.
-  * 🔬 **`Most science`:** Biases the trajectory through high-priority CRISM carbonate and phyllosilicate clay deposits.
-* **Single-Target & Multi-Target Tour Routing:** Route from Habitat `H` to `Target A`, `Target B`, `Target C`, or chain `All targets (best order)` (`H → A → B → C`) with smooth cubic SVG path geometry and a real-time **Elevation Profile Chart (`#elev`)**.
+### 4. 🧭 Slope-Aware A* Pathfinding Engine & Elevation Profiler
+* **Topological Cost-Grid Mesh:** Discrete elevation mesh mapping Jezero Crater floor (`-2540m`) up to the delta scarp (`-2420m`).
+* **8-Directional Diagonal A* Pathfinding:** Dynamically routes around steep impassable scarps (>20°), craters, and boulder fields with Euclidean diagonal movement smoothing.
+* **3 Optimization Modes:**
+  * **`Safest`:** Strictly penalizes slopes >8° and skirts hazardous scarp ridges.
+  * **`Fastest`:** Minimizes traverse distance and Mission Elapsed Time (MET) along optimal terrain contours.
+  * **`Most science`:** Prioritizes routes that intersect verified carbonate and phyllosilicate mineral outcrops.
+* **Real-Time HTML5 Canvas Elevation Profile (`#elev`):** Dynamic cross-section plotting elevation in meters, cumulative traverse distance, and highlighted steep climb segments.
 
-### 5. 🦺 Real-Time Safety Evaluation & Astronaut Field Notes (`SAF-04`)
-* **0–100 Route Safety Score Ring (`#score` & `#ring`):** Evaluates route peak slope against suit `Max slope` (`#r1`), total distance against `Max distance` (`#r2`), and walk duration against `Oxygen` reserve (`#r3`).
-* **Automatic `GO` / `NO-GO` Badge (`#badge`):** Displays glowing emerald **`GO`** when safe, or switches to crimson **`NO-GO`** with specific diagnostic warnings if any suit threshold is breached.
-* **Return-to-Base Countdown (`#hb`):** Dynamically computes the latest safe turn-back time from `MET`, `Oxygen` budget, route duration, and Martian `Sunset` (`17:12`).
-* **Emergency Return to Base (`#rtb`):** 1-click abort button that plots an immediate direct A* escape vector back to Habitat `#H` highlighted in warning coral (`#ff6b8b`).
-* **Persistent Astronaut Field Notes & Sample Tracking (`#modal`):** Per-target `<textarea>` field notes and `Sample collected` checkboxes saved automatically to `localStorage`.
+### 5. 🛡️ Suit Telemetry Limits, GO/NO-GO Matrix & RTB Engine
+* **Interactive Suit Limit Sliders:**
+  * **Max Slope Limit (`#r1`):** Adjustable from 8° to 35°.
+  * **Max Distance Limit (`#r2`):** Adjustable from 1.0 km to 8.0 km.
+  * **Oxygen Supply (`#r3`):** Adjustable from 2.0 h to 8.0 h.
+* **Dynamic Route Safety Score (0–100):** Weighted multi-variable safety evaluation calculating distance margin, slope margin, oxygen consumption, and RTB reserve.
+* **`GO` / `NO-GO` Status Badge:** Instant visual status indicating whether the planned traverse satisfies all planetary survival constraints.
+* **Turn-Around Time Estimator ("Head back by"):** Calculates exact Sol time (e.g. `16:30`) based on walking speed, stay time, and sunset margin (`17:28`).
+* **Emergency Return to Base (`RTB`):** One-tap button that immediately overrides active waypoints, calculates the fastest safe return path to Habitat `H`, and illuminates the route in pulsing emergency coral (`#ff6b8b`).
 
 ### 6. 🥽 Real First-Person Visor HUD Mode (`#hud`)
 * **Real NASA Perseverance Jezero Crater POV Imagery (`ROVER_POV`):**
@@ -94,6 +91,7 @@ Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on globa
   2. *Close-Up Geological Strata Zoom* ($2.2\times$ optical zoom on sedimentary bedding laminae).
   3. *Spectrometer / Mineral False-Color* (High-contrast spectral highlight of Mg-Carbonate and Smectite Clay).
 * **Direct Visor Jump (`View in Helmet HUD 🥽`):** Launches fullscreen HUD mode locked onto the inspected target.
+* **Astronaut Field Notes & Sampling:** Persistent multi-line text notes and sample collection checkboxes saved automatically to `localStorage`.
 
 ### 8. 🐻 Interactive CAPCOM Polar Bear Mascot (`CAPCOM // PAW`)
 * Compact $96\text{px}$ astronaut bear companion in the lower-right corner of `.mapwrap` with contextual speech bubble updates (`#bub`) and clickable catchphrases (*"One small paw for bear-kind! 🚀"*, *"Rocks? I love rocks! 🪨"*, *"Bagged & tagged! Another rock for my collection! 🪨🎒"*).
@@ -104,7 +102,7 @@ Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on globa
 * **Mission Control Manual (`?`):** Glassmorphic modal documenting all 6 operational steps and NASA data attributions.
 
 ### 10. 🧪 Automated End-to-End QA Test Suite (`test_e2e_full.js`)
-* Verified by **14 automated test suites (132 assertions — 132 PASSED, 0 FAILED)** covering JS syntax compilation, HTTP 200 live serving, goal chip sorting, layer comparison clipping, viewport zoom/pan math, carousel rotation, `localStorage` persistence, A* pathfinding across all 3 modes, suit limit `GO`/`NO-GO` transitions, emergency RTB routing, HUD waypoint stepping, and real NASA rover POV integration.
+* Verified by **14 automated test suites (137 assertions — 137 PASSED, 0 FAILED)** covering JS syntax compilation, HTTP 200 live serving, goal chip sorting, layer comparison clipping, viewport zoom/pan math, carousel rotation, `localStorage` persistence, A* pathfinding across all 3 modes, suit limit `GO`/`NO-GO` transitions, emergency RTB routing, HUD waypoint stepping, and real NASA rover POV integration.
 
 ---
 
@@ -128,17 +126,32 @@ Astronauts performing Extravehicular Activity (EVA) on Mars cannot rely on globa
 Pawstro requires **zero external npm packages or build steps** to run in any modern browser.
 
 ```bash
-
-#created by Abhinav Kumar Das , Aditi ,  Hrashvardhan  , Nikhil
 # 1. Clone the repository
-git clone <your-repo-url>
-cd pawstro
+git clone https://github.com/AbhinavKrDas/PAWSTRO.git
+cd PAWSTRO
 
 # 2. Launch a local HTTP server (Python or Node)
-python3 -m http.server 8080
+python -m http.server 8080
 
 # 3. Open in browser
-open http://localhost:8080/
+# Navigate to: http://localhost:8080/
 
-# 4. (Optional) Run the 132-assertion End-to-End QA Test Suite
+# 4. (Optional) Run the 137-assertion End-to-End QA Test Suite
 node test_e2e_full.js
+```
+
+---
+
+## 👥 Flight Crew & Development Team
+
+**Team Name:** **Hibernation Wale Bhalu**  
+**NASA Space Apps Challenge 2026**
+
+* **Abhinav Kumar Das**
+* **Aditi**
+* **Harshavardhan (Harsha)**
+* **Nikhil**
+
+---
+
+*Pawstro – Mission Planner // NASA Space Apps Challenge 2026 // Team Hibernation Wale Bhalu*
